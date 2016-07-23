@@ -17,7 +17,7 @@ The package is almost done, but not release yet (need to write the unit tests), 
 
 How to use it?
 
-```
+```cs
 public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory, IHostingEnvironment env)
 {
   var configuration = new SlackConfiguration()
@@ -31,7 +31,7 @@ public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory, IHo
 
 or
 
-```
+```cs
 public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
 {
   var configuration = new SlackConfiguration()

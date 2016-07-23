@@ -1,6 +1,6 @@
 {
 	"version": "1.0.0-*",
-	"description": "ASP.NET Core Logging library for Slack",
+	"description": "Slack logger provider implementation for Microsoft.Extensions.Logging.",
 	"authors": [ "imperugo" ],
 	"packOptions": {
 		"summary": "ASP.NET Core logger for Slack",

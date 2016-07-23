@@ -3,6 +3,7 @@ using System.Net.Http;
 
 namespace Microsoft.Extensions.Logging.Slack
 {
+
 	public class SlackLoggerProvider : ILoggerProvider
 	{
 		private readonly string applicationName;
@@ -27,6 +28,11 @@ namespace Microsoft.Extensions.Logging.Slack
 		{
 		}
 
+		/// <summary>
+		/// Creates a new <see cref="ILogger"/> instance.
+		/// </summary>
+		/// <param name="categoryName">The category name for messages produced by the logger.</param>
+		/// <returns></returns>
 		public ILogger CreateLogger(string categoryName)
 		{
 			return new SlackLogger(categoryName, filter, httpClient, environmentName, applicationName, configuration.WebhookUrl);

@@ -1,0 +1,1 @@
+dotnet pack Microsoft.Extensions.Logging.Slack/project.json --output nupkgs

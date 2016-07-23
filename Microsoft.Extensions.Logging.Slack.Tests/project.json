@@ -21,7 +21,8 @@
 				"Microsoft.NETCore.App": {
 					"version": "1.0.0-*",
 					"type": "platform"
-				}
+				},
+				"System.Diagnostics.TraceSource": "4.0.0"
 			}
 		},
 		"net451": {

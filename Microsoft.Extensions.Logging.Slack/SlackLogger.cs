@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.Logging.Slack
 {
 	public class SlackLogger : ILogger
 	{
-		private readonly SlackConfiguration configuration;
+		private readonly Uri webhookUri;
 		private readonly HttpClient httpClient;
 		private readonly string applicationName;
 		private readonly string environmentName;
@@ -16,15 +16,15 @@ namespace Microsoft.Extensions.Logging.Slack
 		private Func<LogLevel, bool> filter;
 
 		public SlackLogger(string name, Func<LogLevel, bool> filter, 
-									SlackConfiguration configuration,
 									HttpClient httpClient, 
 									string environmentName, 
-									string applicationName)
+									string applicationName, 
+									Uri webhookUri)
 		{
 			Filter = filter ?? (logLevel => true);
-			this.configuration = configuration;
 			this.environmentName = environmentName;
 			this.applicationName = applicationName;
+			this.webhookUri = webhookUri;
 			this.name = name;
 			this.httpClient = httpClient;
 		}
@@ -108,8 +108,7 @@ namespace Microsoft.Extensions.Logging.Slack
 				}
 			};
 
-			httpClient.PostAsync(configuration.WebhookUrl,
-				new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Wait();
+			httpClient.PostAsync(this.webhookUri,new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Wait();
 		}
 
 		public bool IsEnabled(LogLevel logLevel)

@@ -11,7 +11,9 @@ namespace Microsoft.Extensions.Logging.Slack
 		private readonly Func<LogLevel, bool> filter;
 		private readonly HttpClient httpClient;
 
-		public SlackLoggerProvider(Func<LogLevel, bool> filter, SlackConfiguration configuration, HttpClient httpClient,
+		public SlackLoggerProvider(Func<LogLevel, bool> filter, 
+											SlackConfiguration configuration, 
+											HttpClient httpClient,
 			string applicationName, string environmentName)
 		{
 			this.filter = filter;
@@ -27,7 +29,7 @@ namespace Microsoft.Extensions.Logging.Slack
 
 		public ILogger CreateLogger(string categoryName)
 		{
-			return new SlackLogger(categoryName, filter, configuration, httpClient, environmentName, applicationName);
+			return new SlackLogger(categoryName, filter, httpClient, environmentName, applicationName, configuration.WebhookUrl);
 		}
 	}
 }

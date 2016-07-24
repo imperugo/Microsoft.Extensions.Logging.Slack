@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		private readonly Func<object, Exception, string> defaultFormatter = (state, exception) => state.ToString();
 		private HttpClient client;
 
-		private SlackLogger SetUp(Func<LogLevel, bool> filter)
+		private SlackLogger SetUp(Func<string,LogLevel, bool> filter)
 		{
 			msgHandler = new Mock<FakeHttpMessageHandler> {CallBase = true};
 			msgHandler
@@ -94,7 +94,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void CriticalFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((logLevel) => logLevel >= LogLevel.Critical);
+			var logger = (ILogger) SetUp((category,logLevel) => logLevel >= LogLevel.Critical);
 
 			// Act
 			logger.Log(LogLevel.Warning, 0, state, null, defaultFormatter);
@@ -121,7 +121,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void ErrorFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((logLevel) => logLevel >= LogLevel.Error);
+			var logger = (ILogger) SetUp((category, logLevel) => logLevel >= LogLevel.Error);
 
 			// Act
 			logger.Log(LogLevel.Warning, 0, state, null, defaultFormatter);
@@ -148,7 +148,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void WarningFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((logLevel) => logLevel >= LogLevel.Warning);
+			var logger = (ILogger) SetUp((category, logLevel) => logLevel >= LogLevel.Warning);
 
 			// Act
 			logger.Log(LogLevel.Information, 0, state, null, defaultFormatter);
@@ -175,7 +175,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void InformationFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((logLevel) => logLevel >= LogLevel.Information);
+			var logger = (ILogger) SetUp((category, logLevel) => logLevel >= LogLevel.Information);
 
 			// Act
 			logger.Log(LogLevel.Debug, 0, state, null, defaultFormatter);
@@ -202,7 +202,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void DebugFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger)SetUp((logLevel) => logLevel >= LogLevel.Debug);
+			var logger = (ILogger)SetUp((category, logLevel) => logLevel >= LogLevel.Debug);
 
 			// Act
 			logger.Log(LogLevel.Trace, 0, state, null, defaultFormatter);
@@ -229,7 +229,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void TraceFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger)SetUp((logLevel) => logLevel >= LogLevel.Trace);
+			var logger = (ILogger)SetUp((category, logLevel) => logLevel >= LogLevel.Trace);
 
 			// Act
 			logger.Log(LogLevel.Critical, 0, state, null, defaultFormatter);

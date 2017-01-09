@@ -9,10 +9,10 @@ namespace Microsoft.Extensions.Logging.Slack
 		private readonly string applicationName;
 		private readonly SlackConfiguration configuration;
 		private readonly string environmentName;
-		private readonly Func<string, LogLevel, bool> filter;
+		private readonly Func<string, LogLevel, Exception, bool> filter;
 		private readonly HttpClient httpClient;
 
-		public SlackLoggerProvider(Func<string, LogLevel, bool> filter, 
+		public SlackLoggerProvider(Func<string, LogLevel, Exception, bool> filter, 
 											SlackConfiguration configuration, 
 											HttpClient httpClient,
 			string applicationName, string environmentName)

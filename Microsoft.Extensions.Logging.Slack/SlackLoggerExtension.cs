@@ -18,14 +18,14 @@ namespace Microsoft.Extensions.Logging.Slack
 				throw new ArgumentNullException(nameof(environmentName));
 			}
 
-			ILoggerProvider provider = new SlackLoggerProvider((n,l) => l >= configuration.MinLevel, configuration, client, applicationName, environmentName);
+			ILoggerProvider provider = new SlackLoggerProvider((n,l,e) => l >= configuration.MinLevel, configuration, client, applicationName, environmentName);
 
 			factory.AddProvider(provider);
 
 			return factory;
 		}
 
-		public static ILoggerFactory AddSlack(this ILoggerFactory factory, Func<string, LogLevel, bool> filter, SlackConfiguration configuration, string applicationName, string environmentName, HttpClient client = null)
+		public static ILoggerFactory AddSlack(this ILoggerFactory factory, Func<string, LogLevel, Exception, bool> filter, SlackConfiguration configuration, string applicationName, string environmentName, HttpClient client = null)
 		{
 			if (string.IsNullOrEmpty(applicationName))
 			{
@@ -46,14 +46,14 @@ namespace Microsoft.Extensions.Logging.Slack
 
 		public static ILoggerFactory AddSlack(this ILoggerFactory factory,  SlackConfiguration configuration, IHostingEnvironment hostingEnvironment, HttpClient client = null)
 		{
-			ILoggerProvider provider = new SlackLoggerProvider((n, l) => l >= configuration.MinLevel, configuration, client, hostingEnvironment.ApplicationName, hostingEnvironment.EnvironmentName);
+			ILoggerProvider provider = new SlackLoggerProvider((n, l,e) => l >= configuration.MinLevel, configuration, client, hostingEnvironment.ApplicationName, hostingEnvironment.EnvironmentName);
 
 			factory.AddProvider(provider);
 
 			return factory;
 		}
 
-		public static ILoggerFactory AddSlack(this ILoggerFactory factory, Func<string, LogLevel, bool> filter, SlackConfiguration configuration, IHostingEnvironment hostingEnvironment, HttpClient client = null)
+		public static ILoggerFactory AddSlack(this ILoggerFactory factory, Func<string, LogLevel, Exception, bool> filter, SlackConfiguration configuration, IHostingEnvironment hostingEnvironment, HttpClient client = null)
 		{
 			ILoggerProvider provider = new SlackLoggerProvider(filter, configuration, client, hostingEnvironment.ApplicationName, hostingEnvironment.EnvironmentName);
 

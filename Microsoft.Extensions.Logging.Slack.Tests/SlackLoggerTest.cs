@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		private readonly Func<object, Exception, string> defaultFormatter = (state, exception) => state.ToString();
 		private HttpClient client;
 
-		private SlackLogger SetUp(Func<string,LogLevel, bool> filter)
+		private SlackLogger SetUp(Func<string,LogLevel,Exception, bool> filter)
 		{
 			msgHandler = new Mock<FakeHttpMessageHandler> {CallBase = true};
 			msgHandler
@@ -31,9 +31,9 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 
 		public void Dispose()
 		{
-			this.client?.Dispose();
-			this.client = null;
-			this.msgHandler = null;
+			client?.Dispose();
+			client = null;
+			msgHandler = null;
 		}
 
 		[Fact]
@@ -70,31 +70,10 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		}
 
 		[Fact]
-		public void ThrowsException_WhenNoMessageAndExceptionAreProvided()
-		{
-			var logger = (ILogger) SetUp(null);
-
-			// Act & Assert
-			Assert.Throws<ArgumentNullException>(() => logger.LogCritical(0, null, message: null));
-			Assert.Throws<ArgumentNullException>(() => logger.LogCritical(0, null));
-		}
-
-		[Fact]
-		public void ThrowsException_WhenNoMessageIsProvided()
-		{
-			// Arrange
-			var logger = (ILogger) SetUp(null);
-			var exception = new InvalidOperationException("Invalid value");
-
-			// Act & Assert
-			Assert.Throws<ArgumentNullException>(() => logger.LogCritical(10, message: null, exception: exception));
-		}
-
-		[Fact]
 		public void CriticalFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((category,logLevel) => logLevel >= LogLevel.Critical);
+			var logger = (ILogger) SetUp((category,logLevel, exc) => logLevel >= LogLevel.Critical);
 
 			// Act
 			logger.Log(LogLevel.Warning, 0, state, null, defaultFormatter);
@@ -121,7 +100,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void ErrorFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((category, logLevel) => logLevel >= LogLevel.Error);
+			var logger = (ILogger) SetUp((category, logLevel, exc) => logLevel >= LogLevel.Error);
 
 			// Act
 			logger.Log(LogLevel.Warning, 0, state, null, defaultFormatter);
@@ -145,10 +124,34 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		}
 
 		[Fact]
+		public void ErrorFilterWithException_LogsWhenAppropriate()
+		{
+			// Arrange
+			var logger = (ILogger)SetUp((category, logLevel, exc) =>
+			{
+				if (exc.Message.Contains("Ciupa"))
+				{
+					return true;
+				}
+
+				return false;
+			});
+
+			logger.Log(LogLevel.Error, 0, state, new Exception("Ciupa"), defaultFormatter);
+
+			// Assert
+			msgHandler
+				.Verify(t => t.Send(It.Is<HttpRequestMessage>(
+					msg =>
+						msg.Method == HttpMethod.Post &&
+						msg.RequestUri.ToString() == webhookUrl)), Times.Exactly(1));
+		}
+
+		[Fact]
 		public void WarningFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((category, logLevel) => logLevel >= LogLevel.Warning);
+			var logger = (ILogger) SetUp((category, logLevel, exc) => logLevel >= LogLevel.Warning);
 
 			// Act
 			logger.Log(LogLevel.Information, 0, state, null, defaultFormatter);
@@ -175,7 +178,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void InformationFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger) SetUp((category, logLevel) => logLevel >= LogLevel.Information);
+			var logger = (ILogger) SetUp((category, logLevel, exc) => logLevel >= LogLevel.Information);
 
 			// Act
 			logger.Log(LogLevel.Debug, 0, state, null, defaultFormatter);
@@ -202,7 +205,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void DebugFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger)SetUp((category, logLevel) => logLevel >= LogLevel.Debug);
+			var logger = (ILogger)SetUp((category, logLevel, exc) => logLevel >= LogLevel.Debug);
 
 			// Act
 			logger.Log(LogLevel.Trace, 0, state, null, defaultFormatter);
@@ -229,7 +232,7 @@ namespace Microsoft.Extensions.Logging.Slack.Tests
 		public void TraceFilter_LogsWhenAppropriate()
 		{
 			// Arrange
-			var logger = (ILogger)SetUp((category, logLevel) => logLevel >= LogLevel.Trace);
+			var logger = (ILogger)SetUp((category, logLevel, exc) => logLevel >= LogLevel.Trace);
 
 			// Act
 			logger.Log(LogLevel.Critical, 0, state, null, defaultFormatter);

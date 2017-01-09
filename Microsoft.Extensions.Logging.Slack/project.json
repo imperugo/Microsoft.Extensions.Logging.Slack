@@ -1,5 +1,5 @@
 {
-	"version": "1.0.1-*",
+	"version": "1.1.0-*",
 	"description": "Slack logger provider implementation for Microsoft.Extensions.Logging.",
 	"authors": [ "imperugo" ],
 	"packOptions": {
@@ -17,15 +17,18 @@
 		}
 	},
 	"dependencies": {
-		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-*",
-		"Microsoft.Extensions.Configuration.Abstractions": "1.0.0-*",
-		"Microsoft.Extensions.Logging.Abstractions": "1.0.0-*",
-		"System.Net.Http": "4.1.0",
 		"Newtonsoft.Json": "9.0.1",
-		"Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0"
+		"Microsoft.AspNetCore.Hosting.Abstractions": "1.1.0",
+		"Microsoft.Extensions.Configuration.Abstractions": "1.1.0",
+		"Microsoft.Extensions.Logging.Abstractions": "1.1.0",
+		"System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
 	},
 	"frameworks": {
-		"net451": {},
+		"net451": {
+			"dependencies": {
+				"System.Net.Http": "4.3.0"
+			}
+		},
 		"netstandard1.3": {}
 	},
 	"buildOptions": {

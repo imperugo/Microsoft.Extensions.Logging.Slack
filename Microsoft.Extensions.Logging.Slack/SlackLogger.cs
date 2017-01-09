@@ -13,15 +13,15 @@ namespace Microsoft.Extensions.Logging.Slack
 		private readonly string applicationName;
 		private readonly string environmentName;
 		private readonly string name;
-		private Func<string, LogLevel, bool> filter;
+		private Func<string, LogLevel, Exception, bool> filter;
 
-		public SlackLogger(string name, Func<string, LogLevel, bool> filter, 
+		public SlackLogger(string name, Func<string, LogLevel, Exception, bool> filter, 
 									HttpClient httpClient, 
 									string environmentName, 
 									string applicationName, 
 									Uri webhookUri)
 		{
-			Filter = filter ?? ((category, logLevel) => true);
+			Filter = filter ?? ((category, logLevel, exception) => true);
 			this.environmentName = environmentName;
 			this.applicationName = applicationName;
 			this.webhookUri = webhookUri;
@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.Logging.Slack
 			this.httpClient = httpClient;
 		}
 
-		private Func<string, LogLevel, bool> Filter
+		private Func<string, LogLevel, Exception, bool> Filter
 		{
 			get { return filter; }
 			set
@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.Logging.Slack
 		/// <param name="formatter">Function to create a <c>string</c> message of the <paramref name="state"/> and <paramref name="exception"/>.</param>
 		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
 		{
-			if (!IsEnabled(logLevel))
+			if (!IsEnabled(logLevel, exception))
 			{
 				return;
 			}
@@ -83,7 +83,6 @@ namespace Microsoft.Extensions.Logging.Slack
 			}
 
 			var title = formatter(state, exception);
-
 			var exceptinon = exception?.ToString();
 
 			var obj = new
@@ -125,7 +124,12 @@ namespace Microsoft.Extensions.Logging.Slack
 		/// <returns><c>true</c> if enabled.</returns>
 		public bool IsEnabled(LogLevel logLevel)
 		{
-			return Filter(name, logLevel);
+			return IsEnabled(logLevel, null);
+		}
+
+		public bool IsEnabled(LogLevel logLevel, Exception exc)
+		{
+			return Filter(name, logLevel, exc);
 		}
 
 		/// <summary>
